@@ -9,10 +9,12 @@ import android.widget.TextView;
 
 public class book_Description extends AppCompatActivity {
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_book_description);
+
 
         Intent intent=getIntent();
         Bundle bundle=intent.getExtras();//getting descriptions
@@ -24,11 +26,14 @@ public class book_Description extends AppCompatActivity {
         author.setText("Author: "+bundle.getString("author"));//set genre
 
         TextView genre=(TextView) findViewById(R.id.viewGenre);
-        genre.setText("Genre: "+bundle.getString("genre"));//set genre
+        genre.setText("Genre: "+(bundle.getString("genre")));//set genre
 
         TextView description=(TextView) findViewById(R.id.viewDescription);
         description.setText("Description: "+bundle.getString("description"));//set description
     }
+
+
+
     public void returnHomeSearch(View v){//return home button
         finish();
     }

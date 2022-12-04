@@ -2,6 +2,14 @@ package com.example.librarysystem;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import androidx.activity.result.ActivityResultLauncher;
+
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.widget.Button;
+import com.journeyapps.barcodescanner.ScanContract;
+import com.journeyapps.barcodescanner.ScanOptions;
+
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -22,15 +30,62 @@ public class login extends AppCompatActivity {
     static ReportList ROB;
     static ArrayList<Account> accounts;
     static AccountList lOA;
+    public Intent adminIntent;
+    public Intent userIntent;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-
+        System.out.println(System.getenv("HOMEPATH"));
         createDB();
         createReportList();
+        adminIntent= new Intent(this, AdminMain.class);
+        userIntent= new Intent(this, UserMain.class);
+        Bundle bundle = new Bundle();
+        bundle.putString("userN" , "User");
+        userIntent.putExtras(bundle);
+
     }
+    public void scanCode(View v) {
+        ScanOptions options = new ScanOptions();
+        options.setPrompt("Volume up to flash on");
+        options.setBeepEnabled(true);
+        options.setOrientationLocked(true);
+        options.setCaptureActivity(CaptureAct.class);
+        barLaucher.launch(options);
+
+    }
+
+    ActivityResultLauncher<ScanOptions> barLaucher = registerForActivityResult(new ScanContract(), result->
+    {
+        if(result.getContents() !=null)
+        {
+            AlertDialog.Builder builder = new AlertDialog.Builder(login.this);
+            builder.setMessage("You're about to log into an account labeled: "+result.getContents());
+            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+
+                    dialogInterface.dismiss();
+
+                    if(result.getContents().equals("admin")){
+                        startActivity(adminIntent);
+                    }else{
+                        if(result.getContents().equals("user"))
+                        startActivity(userIntent);
+                    }
+                }
+            });
+            builder.setNegativeButton("BACK", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    dialogInterface.dismiss();
+                }
+            }).show();
+        }
+    });
 
     @Override
     protected void attachBaseContext(Context newBase) {
@@ -213,8 +268,10 @@ public class login extends AppCompatActivity {
             if(listOfAccounts == null ||listOfAccounts.isEmpty()){
                 Account admin = new Account("admin", "pass", true);
                 Account test = new Account("Test", "TestPass");
+                Account user = new Account("User","pass");
                 accounts.add(admin);
                 accounts.add(test);
+                accounts.add(user);
                 lOA = new AccountList(accounts);
                 lOA.writeAccToFile(lOA, getApplicationContext());
                 }
