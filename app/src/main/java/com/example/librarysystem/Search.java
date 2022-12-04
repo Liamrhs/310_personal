@@ -2,10 +2,13 @@ package com.example.librarysystem;
 
 import static com.example.librarysystem.login.lOB;
 
+import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -17,6 +20,9 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
+import com.journeyapps.barcodescanner.ScanContract;
+import com.journeyapps.barcodescanner.ScanOptions;
+
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -26,6 +32,7 @@ public class Search extends AppCompatActivity {
 
     ArrayList<Book> listOfBooks;
     TableLayout displayBooks;//creating references
+    Intent open;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
@@ -74,7 +81,7 @@ public class Search extends AppCompatActivity {
                         //update the file so it contains the book as checked out
                         BookList lOB = new BookList(listOfBooks);
                         lOB.writeToFile(lOB, getApplicationContext());
-                        restart();
+                        openMap(fill.title);
                     }
 
                 });
@@ -135,7 +142,8 @@ public class Search extends AppCompatActivity {
                             //update the file so it contains the book as checked out
                             BookList lOB = new BookList(listOfBooks);
                             lOB.writeToFile(lOB, getApplicationContext());
-                            restart();
+
+                            openMap(fill.title);
                         }
 
                     });
@@ -176,7 +184,7 @@ public class Search extends AppCompatActivity {
                                 //update the file so it contains the book as checked out
                                 BookList lOB = new BookList(listOfBooks);
                                 lOB.writeToFile(lOB, getApplicationContext());
-                                restart();
+                                openMap(fill.title);
                             }
 
                         });
@@ -217,7 +225,7 @@ public class Search extends AppCompatActivity {
                                 //update the file so it contains the book as checked out
                                 BookList lOB = new BookList(listOfBooks);
                                 lOB.writeToFile(lOB, getApplicationContext());
-                                restart();
+                                openMap(fill.title);
                             }
 
                         });
@@ -258,7 +266,7 @@ public class Search extends AppCompatActivity {
                                 //update the file so it contains the book as checked out
                                 BookList lOB = new BookList(listOfBooks);
                                 lOB.writeToFile(lOB, getApplicationContext());
-                                restart();
+                                openMap(fill.title);
                             }
 
                         });
@@ -273,6 +281,29 @@ public class Search extends AppCompatActivity {
 
         };
     }
+    public void openMap(String title){
+        open=new Intent(this, MapsActivity.class);
+        AlertDialog.Builder builder = new AlertDialog.Builder(Search.this);
+        builder.setMessage("Thank you for checking out: "+title);
+        builder.setMessage("You can pick up your newly rented book at our UBC Okanagan location, click the button below for directions");
+        builder.setPositiveButton("Get Directions", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+
+                dialogInterface.dismiss();
+                startActivity(open);
+
+            }
+        });
+        builder.setNegativeButton("No Thank you", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.dismiss();
+                restart();
+            }
+        }).show();
+    }
+
     @Override
     protected void attachBaseContext(Context newBase) {
         super.attachBaseContext(ViewPumpContextWrapper.wrap(newBase));
